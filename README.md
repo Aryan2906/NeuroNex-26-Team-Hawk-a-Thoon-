@@ -94,7 +94,7 @@ Base64 Encoding
 MRI Image Preprocessing  
 ## Installation
 Clone Repository
-git clone https://github.com/yourusername/neurospike.git
+git clone https://github.com/yourusername/NeuroNex-26-Team-Hawk-a-Thoon-.git
 
 cd neurospike
 Create Virtual Environment
