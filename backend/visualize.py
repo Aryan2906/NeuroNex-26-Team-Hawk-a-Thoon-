@@ -11,6 +11,7 @@ import os
 import base64
 from openai import OpenAI
 from dotenv import load_dotenv
+import streamlit as st
 
 load_dotenv()
 sys.path.append(os.path.abspath("../backend"))
@@ -66,11 +67,8 @@ def generate_patient_report(heatmap_path, snn_diagnosis, confidence):
 
         report = response.choices[0].message.content
 
-        print("\n" + "=" * 60)
-        print("FINAL XAI PATIENT REPORT")
-        print("=" * 60)
-        print(report)
-        print("=" * 60 + "\n")
+        st.subheader("AI Generated Patient Report")
+        st.write(report)
 
         with open("final_patient_report.txt", "w") as f:
             f.write(report)
@@ -148,7 +146,9 @@ def generate_heatmap_and_report(
     confidence = (total_spikes[predicted_idx] / total_spikes.sum()) * 100
     diagnosis = classes[predicted_idx]
 
-    print(f" Diagnosis: {diagnosis} ({confidence:.2f}%)")
+    st.success("Analysis Complete")
+    st.write(f"### Diagnosis: {diagnosis}")
+    st.write(f"### Confidence: {confidence:.2f}%")
 
     brain.zero_grad()
     retina.zero_grad()
@@ -174,13 +174,35 @@ def generate_heatmap_and_report(
 
         output_filename = "brain_atrophy_analysis.jpg"
         cv2.imwrite(output_filename, superimposed_img)
-        print(f" Heatmap successfully generated and saved as: {output_filename}")
+        st.image(
+            output_filename,
+            caption="Grad-CAM Heatmap",
+            use_container_width=True
+        )
 
         generate_patient_report(output_filename, diagnosis, confidence)
     else:
         print(" Failed to extract gradients. Check network architecture hooks.")
 
 
-if __name__ == "__main__":
-    test_image = "test_Data/no_dementia/OAS1_0001_MR1_mpr-1_102.jpg"
-    generate_heatmap_and_report(test_image)
+st.title("🧠 NeuroVision AI")
+
+uploaded_file = st.file_uploader(
+    "Upload MRI Scan",
+    type=["jpg", "jpeg", "png"]
+)
+
+if uploaded_file:
+
+    st.image(
+        uploaded_file,
+        caption="Uploaded MRI",
+        use_container_width=True
+    )
+
+    if st.button("Analyze MRI"):
+
+        with open("uploaded_scan.jpg", "wb") as f:
+            f.write(uploaded_file.getbuffer())
+
+        generate_heatmap_and_report("uploaded_scan.jpg")
