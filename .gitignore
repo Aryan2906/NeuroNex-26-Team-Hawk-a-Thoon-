@@ -1,3 +1,6 @@
 venv/
 Data/
 processed_Data/
+.env
+.pth
+test_Data/

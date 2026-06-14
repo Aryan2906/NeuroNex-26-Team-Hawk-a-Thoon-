@@ -27,18 +27,18 @@ class DeepSNNClassifier(nn.Module):
 
 def train_model():
     device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
-    print(f"🚀 Initializing High-Speed SNN Training on: {device.type.upper()}")
+    print(f" Initializing High-Speed SNN Training on: {device.type.upper()}")
 
     dataset_path = os.path.abspath("./Processed_Data")
 
     if not os.path.exists(dataset_path):
-        print(f"❌ Error: Could not find Processed_Data at {dataset_path}")
+        print(f" Error: Could not find Processed_Data at {dataset_path}")
         return
 
-    print("📁 Loading Preprocessed OASIS Dataset...")
+    print("Loading Preprocessed OASIS Dataset...")
     train_dataset = OASISFolderDataset(root_dir=dataset_path)
     train_loader = DataLoader(train_dataset, batch_size=32, shuffle=True, num_workers=8)
-    print(f"✅ Loaded {len(train_dataset)} clean images.")
+    print(f"Loaded {len(train_dataset)} clean images.")
 
     retina = CNNtoSNNConverter().to(device)
     brain = DeepSNNClassifier().to(device)
@@ -55,7 +55,7 @@ def train_model():
     class_weights = torch.tensor([3.0, 10.0, 1.0, 2.0]).to(device)
     loss_fn = SF.ce_count_loss(weight=class_weights)
 
-    print("\n--- 🧠 COMMENCING NEUROMORPHIC TRAINING ---")
+    print("\n--- COMMENCING NEUROMORPHIC TRAINING ---")
 
     for epoch in range(num_epochs):
         retina.train()
@@ -102,10 +102,10 @@ def train_model():
 
         epoch_acc = (correct_predictions / total_samples) * 100
         print(
-            f"✅ EPOCH {epoch + 1} SUMMARY | Avg Loss: {total_loss / len(train_loader):.4f} | Accuracy: {epoch_acc:.2f}%\n"
+            f"EPOCH {epoch + 1} SUMMARY | Avg Loss: {total_loss / len(train_loader):.4f} | Accuracy: {epoch_acc:.2f}%\n"
         )
 
-    print("💾 Training Complete. Saving Weights...")
+    print("Training Complete. Saving Weights...")
     torch.save(retina.state_dict(), "snn_retina.pth")
     torch.save(brain.state_dict(), "snn_brain.pth")
     print("Done. Models saved successfully.")
